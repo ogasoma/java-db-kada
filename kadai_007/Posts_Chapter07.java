@@ -3,9 +3,9 @@ package kadai_007;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-
-
+import java.util.Date;
 public class Posts_Chapter07{
     public static void main(String[] args) {
 
@@ -15,7 +15,7 @@ public class Posts_Chapter07{
         try {
             // データベースに接続
             con = DriverManager.getConnection(
-                "jdbc:mysql://localhost/challenge_java/posts",
+                "jdbc:mysql://localhost/challenge_java",
                 "root",
                 "Pass12345"
             );
@@ -31,7 +31,6 @@ public class Posts_Chapter07{
                       (1003, '2023-02-09', '今日も頑張ります！', 18),
                       (1001, '2023-02-09', '無理は禁物ですよ！', 17),
                       (1002, '2023-02-10', '明日から連休ですね！', 20);
-                      SELECT posted_at, post_content, likes FROM posts WHERE id = 1002;
                     """;
             
             	statement = con.prepareStatement(sql);
@@ -41,8 +40,20 @@ public class Posts_Chapter07{
                 int rowCnt = statement.executeUpdate(sql);
                 System.out.println( rowCnt + "件のレコードが追加されました");
                 
+                String sql2 = "SELECT * FROM posts WHERE user_id = 1002";
+                ResultSet result = statement.executeQuery(sql2);
+                
                 System.out.println( "ユーザーIDが1002のレコードを検索しました");
- 
+                
+                // SQLクエリの実行結果を抽出
+                while(result.next()) {
+                	Date postedAt = result.getDate("posted_at");
+
+                    String post_content = result.getString("post_content");
+                    int likes = result.getInt("likes");
+                    System.out.println(result.getRow() + "件目：投稿日時=" + postedAt +
+                                        "/投稿内容="+ post_content + "／いいね数=" + likes );
+                }
         } catch(SQLException e) {
             System.out.println("エラー発生：" + e.getMessage());
         } finally {
